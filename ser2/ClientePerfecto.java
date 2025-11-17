@@ -1,4 +1,4 @@
-package ser1;
+package ser2;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -6,11 +6,12 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.Scanner;
 
-public class ClientChat {
+public class ClientePerfecto {
+
     public static void main(String[] args) {
 
-        String host = "localhost"; // pepe ==> 10.101.3.86
 
+        String host = "localhost";
 
         int puerto = 6000; // puerto remoto
         Scanner sc = new Scanner(System.in);
@@ -31,7 +32,7 @@ public class ClientChat {
             while (sigue) {
                 // VOY A ESCRIBIR ALGO
                 DataOutputStream out = new DataOutputStream(cliente.getOutputStream());
-                System.out.println("Escribe algo chatin (exit) para salir");
+                System.out.println("Introduce un numero para comprobar si es perfecto: ");
                 String envio = sc.nextLine();
                 out.writeUTF(envio);
 

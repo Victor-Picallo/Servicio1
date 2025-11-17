@@ -5,36 +5,53 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Scanner;
 
 public class ServerChat {
 
     public static void main(String[] args) throws IOException {
 
-        int puerto = 6000;
+        int puerto = 6000; // Puerto
+        Scanner sc = new Scanner(System.in);
 
+        ServerSocket servidor = new ServerSocket(puerto);
+        System.out.println("Escuchando en " + servidor.getLocalPort());
+
+        // esperando a un cliente
+        Socket cliente1 = servidor.accept();
+        System.out.println("Se ha conectado el cliente.");
+
+        // Crear streams para comunicarse con el cliente
+        DataInputStream in = new DataInputStream(cliente1.getInputStream());
+        DataOutputStream out = new DataOutputStream(cliente1.getOutputStream());
+
+
+        boolean sigue = true;
         try {
-            ServerSocket servidor = new ServerSocket(puerto);
-            System.out.println("Escuchando en: " + servidor.getLocalPort());
-            System.out.println("Servicio de chat....");
+            while (sigue) {
+                // Recibir mensaje del cliente
+                String recibido = in.readUTF();
+                if (!recibido.equals("exit")) {
+                    System.out.println("Cliente: " + recibido);
 
-            Socket cliente1 = servidor.accept();
-            DataInputStream in = new DataInputStream(cliente1.getInputStream());
-            DataOutputStream out = new DataOutputStream(cliente1.getOutputStream());
-            System.out.println("Se ha conectado el Primer Cliente");
-            String msg;
-            while (true) {
-                msg = in.readUTF();
-                System.out.println("Cliente: " + msg);
-                if (msg.equalsIgnoreCase("salir")) {
-                    out.writeUTF("salir");
-                    break;
+
+                    // Enviar respuesta al cliente
+                    System.out.print("Servidor: ");
+                    String respuesta = sc.nextLine();
+                    out.writeUTF(respuesta);
+                } else {
+                    System.out.println("apagando servidor...");
+                    sigue = false;
                 }
-                out.writeUTF(msg);
             }
-            System.out.println("Cerrando conexion...");
-            servidor.close();
         } catch (IOException e) {
-            System.err.println("Error en el servidor: " + e.getMessage());
+            System.out.println("Finalizando el programa...");
+        } finally {
+            // Cerrar recursos
+            in.close();
+            out.close();
+            cliente1.close();
+            servidor.close();
         }
     }
 }

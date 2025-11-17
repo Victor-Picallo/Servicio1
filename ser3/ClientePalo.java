@@ -1,7 +1,7 @@
 package ser3;
 
-import javax.xml.crypto.Data;
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.net.Socket;
 import java.util.Scanner;
 
@@ -9,34 +9,42 @@ public class ClientePalo {
 
     public static void main(String[] args) {
 
-        String servidor = "localhost";
-        int puerto = 5000;
+        Scanner sc = new Scanner(System.in);
+        String host = "localhost";
+        int port = 6000;
 
-        try (Socket socket = new Socket(servidor, puerto)) {
-            DataInputStream entrada = new DataInputStream(socket.getInputStream());
-            DataOutputStream salida = new DataOutputStream(socket.getOutputStream());
+        try {
 
-            Scanner sc = new Scanner(System.in);
-            String mensaje;
+            Socket cliente = new Socket(host,port);
 
-            System.out.println("Conectado al servidor. Escribe una texto (o 'quit' para salir): ");
+            System.out.println("Conection data");
+            System.out.println("Port: "+cliente.getPort());
+            System.out.println("Host: "+cliente.getInetAddress().getHostName());
+            System.out.println("Host remote ip: "+cliente.getInetAddress().toString());
 
-            while (true) {
-                mensaje = sc.nextLine();
-                salida.writeUTF(mensaje);
 
-                if (mensaje.equalsIgnoreCase("quit")) {
-                    System.out.println("Cerrando cliente...");
-                    break;
+            boolean keep = true;
+            while (keep) {
+                DataOutputStream dataOutputStream = new DataOutputStream(cliente.getOutputStream());
+                DataInputStream dataInputStream = new DataInputStream(cliente.getInputStream());
+                System.out.println("Enter a sentence");
+                String sentence = sc.nextLine();
+
+                dataOutputStream.writeUTF(sentence);
+
+                if (!sentence.equals("exit")){
+                    String msg = dataInputStream.readUTF();
+                    System.out.println("Message received: " + msg);
+                    System.out.println("=========================================================");
+                } else {
+                    System.out.println("Quiting...");
+                    keep = false;
                 }
-
-                String respuesta = entrada.readUTF();
-                System.out.println("Servidor: " + respuesta);
             }
-
-            sc.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
+
+
     }
 }
